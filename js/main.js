@@ -144,56 +144,7 @@ if (formulario) {  // solo corre en contacto.html donde existe el formulario
 // PASO 1 — Definir los datos en un array
 // Cada { } es un producto. Personaliza con los datos REALES de tu proyecto.
 // Las URLs de imagen son de Unsplash — funcionan sin descargar nada.
-const productos = [
-  {
-    id: 1,
-    icono: "💻",
-    nombre: "MacBook Pro M3",
-    descripcion: "Chip M3, 16 GB RAM, 512 GB SSD, pantalla Liquid Retina.",
-    precio: "$8.999.000",
-    imagen: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=250&fit=crop&q=80"
-  },
-  {
-    id: 2,
-    icono: "📱",
-    nombre: "iPhone 15 Pro",
-    descripcion: "Chip A17 Pro, titanio, Dynamic Island, cámara 48 MP.",
-    precio: "$4.299.000",
-    imagen: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=250&fit=crop&q=80"
-  },
-  {
-    id: 3,
-    icono: "🎮",
-    nombre: "RTX 4070 Super",
-    descripcion: "12 GB GDDR6X, DLSS 3, Ray Tracing. Gaming 4K fluido.",
-    precio: "$2.399.000",
-    imagen: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=250&fit=crop&q=80"
-  },
-  {
-    id: 4,
-    icono: "💼",
-    nombre: "Dell XPS 15",
-    descripcion: "Intel i7 13va gen, 32 GB RAM, pantalla OLED 4K.",
-    precio: "$6.799.000",
-    imagen: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=250&fit=crop&q=80"
-  },
-  {
-    id: 5,
-    icono: "📲",
-    nombre: "Samsung Galaxy S24",
-    descripcion: "Snapdragon 8 Gen 3, IA Galaxy, cámara 200 MP.",
-    precio: "$3.199.000",
-    imagen: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=250&fit=crop&q=80"
-  },
-  {
-    id: 6,
-    icono: "🖥️",
-    nombre: "Monitor LG UltraWide 34\"",
-    descripcion: "Panel IPS curvo, 3440×1440, 144 Hz, HDR10.",
-    precio: "$1.899.000",
-    imagen: "https://images.unsplash.com/photo-1586210579191-33b45e38fa2c?w=400&h=250&fit=crop&q=80"
-  }
-];
+
 
 // PASO 2 — Función que convierte UN objeto producto en HTML de tarjeta
 // Usa backtick ` (no comillas) para escribir HTML con variables ${...}
@@ -220,17 +171,49 @@ function crearTarjeta(producto) {
   `;
 }
 
-// PASO 3 — Buscar el contenedor en index.html
-// Tu index.html tiene:  <div id="grid-tarjetas">
-const gridTarjetas = document.querySelector('#grid-tarjetas');
+// ================================================
+// S08: CARGAR PRODUCTOS DESDE JSON
+// Reemplaza el array hardcodeado de S03.
+// Funciona en: productos.html (donde existe #grid-tarjetas)
+// Requiere: data/productos.json con el array de productos
+// ================================================
 
-// PASO 4 — Llenar el grid con las tarjetas generadas
-// .map(crearTarjeta) → convierte cada objeto del array en HTML (string)
-// .join('')         → une todos esos strings en uno solo
-if (gridTarjetas) {  // ✏️ solo corre en páginas que tienen #grid-tarjetas
-  gridTarjetas.innerHTML = productos.map(crearTarjeta).join('');
+async function cargarProductos() {
+  const grid = document.querySelector('#grid-tarjetas');
+  if (!grid) return; // solo correr en páginas que tienen el grid
+
+  try {
+    // PASO 1 — Pedir el archivo JSON al servidor
+    // await pausa aquí hasta que llegue la respuesta (el sobre)
+    const respuesta = await fetch('data/productos.json');
+
+    // PASO 2 — Leer el contenido del JSON como array JavaScript
+    // .json() también es asíncrono → necesita su propio await
+    const productos = await respuesta.json();
+
+    // PASO 3 — Renderizar las tarjetas en el grid
+    // productos.map(crearTarjeta) convierte cada objeto en HTML
+    grid.innerHTML = productos.map(crearTarjeta).join('');
+
+    // PASO 4 — Reconectar todo lo que depende de las tarjetas
+    // Estas funciones buscan .tarjeta en el HTML → deben ir DESPUÉS del innerHTML
+    registrarBotonesModal(); // botones "Ver más" → abrir modal
+    registrarBadgeHover();   // badge "✓ Disponible" al hacer hover
+    registrarBuscador();     // filtro de búsqueda en tiempo real
+
+  } catch (error) {
+    // Si fetch falla: muestra mensaje visible en la página
+    grid.innerHTML = `
+      <div class="error-fetch">
+        <p>⚠️ No se pudieron cargar los productos.</p>
+        <button onclick="cargarProductos()" class="btn btn-primario">Reintentar</button>
+      </div>
+    `;
+    console.error('Error al cargar productos:', error);
+  }
 }
 
+cargarProductos(); // ejecutar al cargar la página
 
 // ══════════════════════════════════════════════
 // EJERCICIO 1 · MODAL PRODUCTO
@@ -240,15 +223,44 @@ const modal = document.querySelector('#modal-producto');
 
 if (modal) {
   const btnCerrar = document.querySelector('#modal-cerrar');
-  const botonesVerMas = document.querySelectorAll('.btn-accion');
-  
+
+  // Llena el modal con los datos del producto y lo hace visible
+  // tarjeta.dataset lee los atributos data-* del <article class="tarjeta">
   function abrirModal(tarjeta) {
-    document.querySelector('#modal-icono').textContent = tarjeta.dataset.icono || '📦';
+    document.querySelector('#modal-icono').textContent  = tarjeta.dataset.icono  || '📦';
     document.querySelector('#modal-titulo').textContent = tarjeta.dataset.nombre || 'Producto';
-    document.querySelector('#modal-desc').textContent = tarjeta.dataset.des || '';
+    document.querySelector('#modal-desc').textContent   = tarjeta.dataset.desc   || '';
     document.querySelector('#modal-precio').textContent = tarjeta.dataset.precio || '';
-    modal.classList.add('visible')
+    modal.classList.add('visible');
   }
+
+  // Se llama desde cargarProductos() DESPUÉS de grid.innerHTML
+  // porque los botones .btn-accion los crea crearTarjeta() dinámicamente
+  function registrarBotonesModal() {
+    document.querySelectorAll('.btn-accion').forEach(function(boton) {
+      boton.addEventListener('click', function() {
+        abrirModal(boton.closest('.tarjeta'));
+      });
+    });
+  }
+
+  // Cerrar con el botón ×
+  btnCerrar.addEventListener('click', function() {
+    modal.classList.remove('visible');
+  });
+
+  // Cerrar al hacer clic fuera del modal
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.classList.remove('visible');
+  });
+
+  // Cerrar con la tecla Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') modal.classList.remove('visible');
+  });
+}
+
+cargarProductos(); // ejecutar al cargar la página
 
   botonesVerMas.forEach(function(boton) {
     boton.addEventListener('click', function() {
@@ -272,7 +284,7 @@ if (modal) {
       modal.classList.remove('visible');
     }
   });
-}
+
 
 // ══════════════════════════════════════════════
 // EJERCICIO 2 · BARRA DE PROGRESO SCROLL
@@ -321,36 +333,32 @@ function crearTarjeta(producto) {
 
 const todasLasTarjetas = document.querySelectorAll('.tarjeta');
 
-todasLasTarjetas.forEach(function(tarjeta) {
-  const badge = tarjeta.querySelector('.badge-disponible');
-
-  if (badge) {
-    // Mostrar badge al entrar el mouse
-    tarjeta.addEventListener('mouseover', function() {
-      badge.classList.add('visible');
-    });
-
-    // Ocultar badge al salir el mouse
-    tarjeta.addEventListener('mouseout', function() {
-      badge.classList.remove('visible');
-    });
-  }
-});
+// Muestra el badge "✓ Disponible" al pasar el mouse por una tarjeta
+// Se llama desde cargarProductos() — las tarjetas deben existir primero
+function registrarBadgeHover() {
+  document.querySelectorAll('.tarjeta').forEach(function(tarjeta) {
+    const badge = tarjeta.querySelector('.badge-disponible');
+    if (badge) {
+      tarjeta.addEventListener('mouseover', function() { badge.classList.add('visible'); });
+      tarjeta.addEventListener('mouseout',  function() { badge.classList.remove('visible'); });
+    }
+  });
+}
 
 
-const buscador = document.querySelector('#buscador');
 
-if (buscador) {
+// Filtra las tarjetas en tiempo real según lo que escribe el usuario
+// Se llama desde cargarProductos() — las tarjetas deben existir primero
+function registrarBuscador() {
+  const buscador = document.querySelector('#buscador');
+  if (!buscador) return; // solo correr en páginas con buscador
   buscador.addEventListener('input', function() {
+    // .toLowerCase() para que "macbook" encuentre "MacBook"
     const termino = buscador.value.toLowerCase();
-    
-    todasLasTarjetas.forEach(function(tarjeta) {
+    document.querySelectorAll('.tarjeta').forEach(function(tarjeta) {
       const nombre = tarjeta.dataset.nombre.toLowerCase();
-      if (nombre.includes(termino)) {
-        tarjeta.style.display = 'block';
-      } else {
-        tarjeta.style.display = 'none';
-      }
+      // muestra u oculta según si el nombre incluye el término buscado
+      tarjeta.style.display = nombre.includes(termino) ? 'block' : 'none';
     });
   });
 }
