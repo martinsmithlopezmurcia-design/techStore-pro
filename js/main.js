@@ -141,9 +141,6 @@ if (formulario) {  // solo corre en contacto.html donde existe el formulario
 // Requiere: <div id="grid-tarjetas"> vacío en index.html
 // ================================================
 
-// PASO 1 — Definir los datos en un array
-// Cada { } es un producto. Personaliza con los datos REALES de tu proyecto.
-// Las URLs de imagen son de Unsplash — funcionan sin descargar nada.
 
 
 // PASO 2 — Función que convierte UN objeto producto en HTML de tarjeta
@@ -215,6 +212,7 @@ async function cargarProductos() {
 
 cargarProductos(); // ejecutar al cargar la página
 
+
 // ══════════════════════════════════════════════
 // EJERCICIO 1 · MODAL PRODUCTO
 // Solo en productos.html (donde existe #modal-producto)
@@ -259,33 +257,6 @@ if (modal) {
     if (e.key === 'Escape') modal.classList.remove('visible');
   });
 }
-
-cargarProductos(); // ejecutar al cargar la página
-
-  botonesVerMas.forEach(function(boton) {
-    boton.addEventListener('click', function() {
-      const tarjeta = boton.closest('.tarjeta');
-      abrirModal(tarjeta);
-    });
-  });
-
-  btnCerrar.addEventListener('click', function() {
-    modal.classList.remove('visible');
-  });
-  
-  modal.addEventListener('click', function(evento) {
-    if (evento.target === modal) {
-      modal.classList.remove('visible');
-    }
-  });
-
-  document.addEventListener('keydown', function(evento) {
-    if (evento.key === 'Escape') {
-      modal.classList.remove('visible');
-    }
-  });
-
-
 // ══════════════════════════════════════════════
 // EJERCICIO 2 · BARRA DE PROGRESO SCROLL
 // Funciona en todas las páginas
@@ -331,8 +302,6 @@ function crearTarjeta(producto) {
 // Solo en productos.html
 // ══════════════════════════════════════════════
 
-const todasLasTarjetas = document.querySelectorAll('.tarjeta');
-
 // Muestra el badge "✓ Disponible" al pasar el mouse por una tarjeta
 // Se llama desde cargarProductos() — las tarjetas deben existir primero
 function registrarBadgeHover() {
@@ -344,8 +313,6 @@ function registrarBadgeHover() {
     }
   });
 }
-
-
 
 // Filtra las tarjetas en tiempo real según lo que escribe el usuario
 // Se llama desde cargarProductos() — las tarjetas deben existir primero
