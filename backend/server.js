@@ -4,6 +4,8 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose');
 const Producto = require ('./models/Producto');
+const authRoutes = require('./routes/auth')
+const verificarToken = require('./middleware/auth')
 
 // 2. crear la aplicacion y definir el puerto
 const app = express();
@@ -29,7 +31,7 @@ app.get('/api/productoa', async (req, res) => {
 });
 
 // 6. ruta POST /api/productos - crear un produto nuevo ← AGREGAR aqui
-app.post('/api/Productos', async (req, res) => {
+app.post('/api/Productos',verificarToken, async (req, res) => {
     try {
         const nuevoProducto = await Producto.create(req.body); // toma el JSON del body
         res.status(201).json(nuevoProducto);                   // 201 = Created
@@ -39,7 +41,7 @@ app.post('/api/Productos', async (req, res) => {
 });
 
 // 7. Ruta PUT /api/productos/:id - actualizar un prducto
-app.put('/api/productos/:id', async (req, res) => {
+app.put('/api/productos/:id', verificarToken, async (req, res) => {
     try {
         const actualizado = await Producto.findByIdAndUpdate(
             req.params.id,   // _id de MOngoDB que viene de la URL
@@ -54,7 +56,7 @@ app.put('/api/productos/:id', async (req, res) => {
 });
 
 // 8. Ruta DELETE /api/productos/:id - eliminar un producto
-app.delete('/api/productos/:id', async (req, res)=> {
+app.delete('/api/productos/:id', verificarToken, async (req, res)=> {
     try {
         const eliminado = await Producto.findByIdAndDelete(req.params.id);
         if (!eliminado) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -74,3 +76,5 @@ app.listen(PORT, () => {
     console.log(`Servidor en https://localhost:${PORT}`);
 });
 
+// 11. Rutas de autentificacion ← NUEVO S14
+app.use('/api/auth', authRoutes);
