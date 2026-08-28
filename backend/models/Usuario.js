@@ -5,8 +5,12 @@ const mongoose = require('mongoose');
 const usuarioSchema = new mongoose.Schema({
     nombre:   { type: String, required: true },
     email:    { type: String, required: true, unique: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    roll:     {type: String,
+                enum: ['admin', 'cliente'],
+                default: 'cliente'}
 });
+
 
 // 3. Exportar el model
 const usuario = mongoose.model('Usuario', usuarioSchema);
