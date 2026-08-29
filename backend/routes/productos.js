@@ -1,6 +1,6 @@
 // 1. Importar dependencias
 const  express               = require('express')
-const  producto              = require('../models/Producto');
+const  Producto              = require('../models/Producto');
 const verificarToken        = require('../middleware/auth');
 const verificarAdmin         = require('../middleware/admin');
 const  router                = express.Router();

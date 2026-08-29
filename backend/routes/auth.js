@@ -4,6 +4,7 @@ const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 const router  = require('express').Router();
+const Producto = require('../models/Producto'); 
 
 // 2. POST /api/auth/registro - crear cuenta nueva
 router.post('/registro', async (req, res) => {

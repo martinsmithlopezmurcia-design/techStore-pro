@@ -1,38 +1,73 @@
-const express             = require('express')
-const Orden               = require('../middleware/auth');
-const verificarToken = require('../middleware/auth'); 
-const usuario = require('../models/Usuario');
-const producto = require('../models/Producto');
-const router              = express.Router();
+const express = require('express');
+const Orden = require('../models/Orden');
+const verificarToken = require('../middleware/auth');
 
-// POST / api/ordenes - crear una ordene
-// El usuario logiado crea su propia orden
-router.post('/',verificarToken,  async (req, res) => {
+const router = express.Router();
+
+console.log('======================================');
+console.log('📦 MODELO ORDEN CARGADO');
+console.log('Orden:', Orden);
+console.log('Orden.create:', Orden.create);
+console.log('======================================');
+
+
+// POST /api/ordenes
+router.post('/', verificarToken, async (req, res) => {
+
+    console.log('🔥🔥🔥 POST /api/ordenes RECIBIDO');
+
     try {
+
+        console.log('req.body:', req.body);
+        console.log('req.usuario:', req.usuario);
+        console.log('Orden.create:', Orden.create);
+
         const { productos, total } = req.body;
-        const nuevaOrden =await Orden.create({
+
+        const nuevaOrden = await Orden.create({
             usuario: req.usuario.id,
-            productos,
-            total
-        });                 // 201 = Created
+            productos: productos,
+            total: total
+        });
+
+        console.log('✅ ORDEN CREADA:', nuevaOrden);
+
+        res.status(201).json(nuevaOrden);
+
     } catch (err) {
-        res.status(400).json({ error: err.message });          // 400 = datos invalidos 
+
+        console.error('❌ ERROR CREANDO ORDEN:', err);
+
+        res.status(400).json({
+            error: err.message
+        });
     }
 });
 
-// GET  /api/ordenes - mis ordenes
-// cada usuario ve solo sus propias ordenes 
-//2, GET / - publico, sin token 
+
+// GET /api/ordenes
 router.get('/', verificarToken, async (req, res) => {
-    try{
-        const ordenes = await orden
-        .find({ usuario: req.usuario.id })
-        .populate ('usuario', 'nombre email')
-        .pupulate('productos.producto', 'nombre precio')
+
+    try {
+
+        const ordenes = await Orden
+            .find({
+                usuario: req.usuario.id
+            })
+            .populate('usuario', 'nombre email')
+            .populate('productos.producto', 'nombre precio');
+
         res.json(ordenes);
-    }catch (err) {
-        res.status(500).json({ error: err.message });
+
+    } catch (err) {
+
+        console.error('❌ ERROR OBTENIENDO ORDENES:', err);
+
+        res.status(500).json({
+            error: err.message
+        });
     }
 });
+
 
 module.exports = router;
