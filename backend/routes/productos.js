@@ -7,13 +7,14 @@ const  router                = express.Router();
 
 //2, GET / - publico, sin token 
 router.get('/', async (req, res) => {
-    try{
-        const productos = await producto.find();
+    try {
+        const productos = await Producto.find(); // <-- Corregido a 'Producto' con mayúscula
         res.json(productos);
-    }catch (err) {
-        resizeBy.status(500).json({ errror: 'Error al odtener productos' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener productos' }); // <-- Corregido 'res' y ortografía
     }
 });
+
 
 // 3. POST / - solo admin (verificartojken + verificarAdmin)
 router.post('/', verificarToken, verificarAdmin,  async (req, res) => {

@@ -1,80 +1,45 @@
-// ======================================================
-// 1. IMPORTAR DEPENDENCIAS
-// ======================================================
-
+// 1. Importar Las dependencias
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
-
-// ======================================================
-// 2. IMPORTAR RUTAS
-// ======================================================
-
+const Producto = require('./models/Producto');
 const authRoutes = require('./routes/auth');
+const verificarToken = require('./middleware/auth')
 const productosRoutes = require('./routes/productos');
-const ordenesRoutes = require('./routes/ordenes');
+const ordenesRoutes = require('./routes/ordenes')
 
-
-// ======================================================
-// 3. CREAR APLICACIÓN
-// ======================================================
-
+// 2. Crear la aplicación y definir el puerto
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
-
-// ======================================================
-// 4. MIDDLEWARES
-// ======================================================
-
+// 3. Activar middlewares
 app.use(cors());
-
 app.use(express.json());
 
-
-// ======================================================
-// 5. CONECTAR A MONGODB ATLAS
-// ======================================================
-
+// 4. Conectar a MongoDB Atlas  
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('✅ conectado a MongoDB Atlas');
-    })
-    .catch((err) => {
-        console.error('❌ Error de conexión:', err);
-    });
+    .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+    .catch((err) => console.error('❌ Error de coneccion: ', err))
 
 
-// ======================================================
-// 6. RUTA PRINCIPAL
-// ======================================================
 
-app.get('/', (req, res) => {
-    res.json({
-        mensaje: 'servidor TechStore Pro ✅'
-    });
+
+// 9. Ruta de prueba 
+app.get('/', (req,res) => {
+    res.json({mensaje: 'Servidor TechStore Pro✅'});
 });
 
+// 10. Arrancar Servidor
+app.listen(PORT, () => {
+    console.log(`Servidor en http://localhost:${PORT}`);
+});
 
-// ======================================================
-// 7. RUTAS
-// ======================================================
-
+// 11. Rutas de autenticacion
 app.use('/api/auth', authRoutes);
 
+// 12.Rutas de productos
 app.use('/api/productos', productosRoutes);
 
+// 13.Rutas de órdenes
 app.use('/api/ordenes', ordenesRoutes);
-
-
-// ======================================================
-// 8. INICIAR SERVIDOR
-// ======================================================
-
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor en http://localhost:${PORT}`);
-});
