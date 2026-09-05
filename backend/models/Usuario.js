@@ -9,8 +9,8 @@ const usuarioSchema = new mongoose.Schema({
     rol:     {type: String,
                 enum: ['admin', 'cliente'],
                 default: 'cliente'},
-    deprtamento:  { type: String, required: true },
-    municipio:    { type: String, requireD: true},
+    departamento:  { type: String, required: true },
+    municipio:    { type: String, required: true},
 });
 
 
