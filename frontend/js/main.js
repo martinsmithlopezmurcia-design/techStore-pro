@@ -415,7 +415,7 @@ function actualizarNavSesion() {
       e.preventDefault();
       if (confirm('¿Cerrar sesión')) {
         localStorage.removeItem('token');
-        localStorage.removeItem('usuario-nombre');
+        localStorage.removeItem('usuario-nombre'); 
         window.location.href = 'login.html';
       }
     }); 
