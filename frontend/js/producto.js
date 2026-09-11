@@ -5,14 +5,14 @@ async function cargarProductoDetalle() {
 
     const elCargando = document.getElementById('estado-cargando');
     const elError    = document.getElementById('estado-error');
-    const elDetalle    = document.getElementById('estado-detalle');
+    const elDetalle    = document.getElementById('producto-detalle');
 
     // 2. Sin id en la URL → mostrar error
     if (!id) {elCargando.style.display ='none'; elError.style.display = 'block'; return; }
 
     try {
         // 3. Pedir el producto al backend (ruta del paso 1)
-        const respuesta = await fetch('http://localhost:300/api/productos' + id)
+        const respuesta = await fetch('http://localhost:3000/api/productos/' + id)
         if (!respuesta.ok) throw new Error('No encontrado');
         const producto = await respuesta.json();
 
@@ -25,8 +25,27 @@ async function cargarProductoDetalle() {
         const imgWrap = document.getElementById('producto-imagen-wrap');
         imgWrap.innerHTML = producto.imagen
             ? `<img src="${producto.imagen}" alt="${producto.nombre}">`
-            : `<div class="producto-imagen-placeholder">${producto.icono || '📦'}</div>`;
+            : `<div class="producto-imagen-placeholder">${producto.icono || ''}</div>`;
         
         // 5. Mostrar el contenido
+        elCargando.style.display = 'none';
+        elDetalle.style.display  = 'flex';
 
+        // 6. Boton agregar el carrito - agregarLlCarrito() viene de main.js
+        document.getElementById('btn-agregar-carrito').addEventListener('click', function() {
+            agregarAlCarrito({ id: producto._id, nombre: producto.nombre,
+                precio: producto.precio, icono: producto.icono || '',
+                imagen: producto.imagen || '', fecha: new Date().toLocaleDateString('es-CO') });
+            const msg = document.getElementById('producto-mensaje');
+            msg.innerHTML = '<div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;">'
+            + '<p style="color:#15803d;font-weight:600;">✔️ Agregado - <a href="carrito.html" style="color:#166534;">Ver carrito</a></p></div>';
+            msg.style.display = 'block';
+        });
+
+    } catch (err) {
+        elCargando.style.display = 'none';
+        elError.style.display    = 'block';
     }
+}
+
+cargarProductoDetalle();

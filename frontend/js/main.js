@@ -117,7 +117,7 @@ function crearTarjeta(producto) {
 
         <div class="tarjeta-pie">
           <span class="tarjeta-precio">${producto.precio}</span>
-          <button class="btn-accion">Ver más</button>
+          <a href="producto.html?id=${producto._id || producto._id || ''}" class="btn-accion"> Ver mas</a>
         </div>
       </div>
     </article>
@@ -175,7 +175,8 @@ if (modal) {
 
   function registrarBotonesModal() {
     document.querySelectorAll('.btn-accion').forEach(function(boton) {
-      boton.addEventListener('click', function() {
+      if (boton.tagName === 'A') return;
+      boton.addEventListener('click', function(){
         abrirModal(boton.closest('.tarjeta'));
       });
     });
@@ -401,31 +402,64 @@ mostrarPaginaCarrito();
 // ==== S17c: ESTADO DE SESION EN EL NAV ====
 
 function actualizarNavSesion() {
-  const token        = localStorage.getItem('token');
-  const nombre       = localStorage.getItem('usuario-nombre');
-  const enlaceLogin  = document.querySelector('#nav-login');
-
+  const token       = localStorage.getItem('token');
+  const nombre      = localStorage.getItem('usuario-nombre');
+  const enlaceLogin = document.querySelector('#nav-login');
   if (!enlaceLogin) return;
 
   if (token && nombre) {
-    enlaceLogin.textContent = '🗣️' + nombre;
-    enlaceLogin.href = '#';
-    enlaceLogin.title = 'cerrar sesión';
-    enlaceLogin.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (confirm('¿Cerrar sesión')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario-nombre'); 
-        window.location.href = 'login.html';
-      }
-    }); 
+      // 1. Construir wrapper y botón con el nombre
+      const wrapper = document.createElement('div');
+      wrapper.className = 'usuario-dropdown';
+      const btn = document.createElement('button');
+      btn.className = 'usuario-btn';
+      btn.textContent = '👤 ' + nombre;
+
+      // 2. Construir menú con las tres opciones
+      const menu = document.createElement('div');
+      menu.className = 'usuario-menu';
+      const linkPerfil = document.createElement('a');
+      linkPerfil.href = 'perfil.html'; linkPerfil.textContent = '👤 Mi perfil';
+      const linkPedidos = document.createElement('a');
+      linkPedidos.href = 'mispedidos.html'; linkPedidos.textContent = '📦 Mis pedidos';
+      const sep = document.createElement('div');
+      sep.className = 'menu-separador';
+      const btnCerrar = document.createElement('button');
+      btnCerrar.className = 'btn-cerrar-sesion';
+      btnCerrar.textContent = '🚪 Cerrar sesión';
+      btnCerrar.addEventListener('click', function() {
+          localStorage.removeItem('token'); localStorage.removeItem('usuario-nombre');
+          window.location.href = 'login.html';
+      });
+      menu.appendChild(linkPerfil); menu.appendChild(linkPedidos);
+      menu.appendChild(sep); menu.appendChild(btnCerrar);
+      wrapper.appendChild(btn); wrapper.appendChild(menu);
+
+      // 3. Ocultar "Registro" - no tiene sentido estando logueado
+      const navMenu = document.querySelector('#nav-menu');
+      if (navMenu) navMenu.querySelectorAll('a').forEach(function(a) {
+          if (a.href.includes('registro.html')) a.style.display = 'none';
+      });
+
+      // 4. Reemplazar el <a id="nav-login"> por el dropdown
+      enlaceLogin.parentNode.replaceChild(wrapper, enlaceLogin);
+
+      // 5. Abrir/cerrar al hacer clic; cerrar al clic fuera
+      btn.addEventListener('click', function(e) {
+          e.stopPropagation(); menu.classList.toggle('abierto');
+      });
+      document.addEventListener('click', function(e) {
+          if (!wrapper.contains(e.target)) menu.classList.remove('abierto');
+      });
+
   } else {
-    enlaceLogin.textContent = 'Login';
-    enlaceLogin.href = 'login.html';
+      enlaceLogin.textContent = 'Login';
+      enlaceLogin.href = 'login.html';
   }
 }
 
 actualizarNavSesion();
+
 
 // ==== S17c: CHECKOUT - CONFIRMAR PEDIDO ====
 
