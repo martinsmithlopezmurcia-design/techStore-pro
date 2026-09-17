@@ -1,7 +1,7 @@
 const express = require('express');
 const Orden = require('../models/Orden');
-const verificarToken = require('../middleware/auth');
 
+const verificarToken = require('../middleware/auth');
 const router = express.Router();
 
 console.log('======================================');

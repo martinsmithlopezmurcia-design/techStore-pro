@@ -14,7 +14,7 @@ const productoSchema = new mongoose.Schema({
 });
 
 // Crea el model - Mongoose busca la coleccion 'productos9en Atlas
-const producto = mongoose.model('producto', productoSchema);
+const producto = mongoose.model('Producto', productoSchema);
 
 // Exportar para poder usarlo en server.js
 module.exports = producto;

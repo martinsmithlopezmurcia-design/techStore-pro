@@ -38,9 +38,13 @@ const ordenSchema = new Schema(
                 'pendiente',
                 'procesando',
                 'enviando',
-                'entregado'
+                'entregado',
+                'PAGO_CONFIRMADO'
             ]
-        }
+        },
+          // Datos de Wompi — se llenan solo cuando el pago fue aprobado
+        wompiTransactionId: { type: String },
+        wompiReference:     { type: String }
     },
     {
         timestamps: true
