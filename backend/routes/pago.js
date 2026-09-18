@@ -24,7 +24,7 @@ router.post('/firma', verificarToken, async (req, res) => {
     await Transaccion.create({
       wompiReference: reference, amountInCents, currency,
       status: 'PENDING',
-      pendingOrderData: { usuario: req.usuario.id, productos, total }
+      pendingOrderData: { usuario: req.usuario.id || req.usuario._id, productos, total }
     });
 
     res.json({
