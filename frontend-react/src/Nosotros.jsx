@@ -18,19 +18,22 @@ const valores = [
 // Reemplaza estos datos de ejemplo por los integrantes reales de tu grupo
 const equipo = [
     {
-        nombre: "Integrante 1",
+        nombre: "Martin lopez",
         cargo: "Desarrollo frontend",
         descripcion: "Construye las páginas con React y Tailwind CSS.",
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeaGxq_kE4nDy-PLnx-l5ZS0Jja9VZeGIuQEHXJi_Hhy_wATZlSI23RoK1&s=10",
     },
     {
-        nombre: "Integrante 2",
+        nombre: "Inalik",
         cargo: "Desarrollo backend",
         descripcion: "Crea la API con Express y conecta MongoDB Atlas.",
+        imagen: "https://i.pinimg.com/236x/e2/7d/17/e27d176451e72a05efd82548cc8c9d53.jpg",
     },
     {
-        nombre: "Integrante 3",
+        nombre: "Edgar Lopez",
         cargo: "Pruebas y calidad",
         descripcion: "Verifica que cada función trabaje como se diseñó.",
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjft3yKo_uDV2xkBvAnAwPXEtnDRR5RTQdMn2H5GHxGsOS2evox-HmRYQ&s=10",
     },
 ];
 
@@ -87,9 +90,11 @@ function Nosotros() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {equipo.map((persona, i) => (
                         <div key={persona.nombre} className="flex flex-col gap-3">
-                            <div className="size-20 rounded-full bg-gray-100 flex items-center justify-center font-mono text-sm text-gray-500">
-                                {String(i + 1).padStart(2, "0")}
-                            </div>
+                            <img 
+                                src={persona.imagen} 
+                                alt={persona.nombre} 
+                                className="size-20 rounded-full object-cover border border-gray-200" 
+                                />
                             <h3 className="font-display font-semibold text-lg">{persona.nombre}</h3>
                             <p className="font-mono text-xs uppercase tracking-wider text-accent-dark">
                                 {persona.cargo}
