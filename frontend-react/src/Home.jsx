@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard.jsx";
+import ProductoModal from "./ProductoModal.jsx";
 
 function Home() {
     const navegar = useNavigate();
     const [productos, setProductos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
+    const [seleccionado, setSeleccionado] = useState(null);
 
     useEffect(() => {
         fetch("http://localhost:3000/api/productos")
@@ -113,11 +115,19 @@ function Home() {
                                 descripcion={p.descripcion}
                                 precio={p.precio}
                                 imagen={p.imagen}
+                                onVer={() => setSeleccionado(p)}
                             />
                         ))}
                     </div>
                 )}
             </section>
+
+            {seleccionado && (
+                <ProductoModal
+                producto={seleccionado}
+                onCerrar={() => setSeleccionado(null)}
+                />
+            )}
         </div>
     );
 }
