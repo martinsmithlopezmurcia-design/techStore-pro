@@ -22,23 +22,29 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-//4. Conectar a MongoDB atlas NUEVO..
+// 4. Conectar a MongoDB: local o Atlas segun DB_MODO en el .env
+const modo = process.env.DB_MODO === 'local' ? 'local' : 'atlas';
 
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ Conectado a MongoDB Atlas'))
-    .catch((err) => console.error('❌ Error de conexión:', err))
+// Usamos MONGODB_URI (que es la que trae tu .env de Atlas) o MONGODB_URI_ATLAS como respaldo
+const uri = modo === 'local' 
+    ? process.env.MONGODB_URI_LOCAL 
+    : (process.env.MONGODB_URI || process.env.MONGODB_URI_ATLAS);
+
+mongoose.connect(uri)
+    .then(() => console.log('✅ Conectado a MongoDB (' + modo + ')'))
+    .catch((err) => console.error('❌ Error de conexión: ', err));
 
 
 //9 . ruta de prueba
 
 app.get('/', (req, res) => {
-    res.json({ mensaje: 'Servidor TechStore Pro ✅'});
+    res.json({ mensaje: 'Servidor TechStore Pro ✅', baseDeDatos: modo });
 });
 
 //10 . Arrancar el servidor 
 
 app.listen(PORT, ()  => {
-    console.log(`Servidor en https://localhost:${PORT}`);
+    console.log(`Servidor en http://localhost:${PORT}`);
 });
 
 //11. Rutas de autenticacion <- NUEVO S14
