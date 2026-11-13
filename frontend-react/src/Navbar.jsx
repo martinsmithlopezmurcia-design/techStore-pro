@@ -11,9 +11,10 @@ const enlaces = [
 ];
 
 function Navbar() {
-    const { items, vaciarCarrito } = useContext(CartContext);
+    const { items } = useContext(CartContext);
     const { usuario, logout } = useContext(AuthContext);
     const [abierto, setAbierto] = useState(false);
+    const unidades = items.reduce((suma, item) => suma + item.cantidad, 0);
 
     function cerrar() {
         setAbierto(false);
@@ -43,17 +44,14 @@ function Navbar() {
                 </ul>
 
                 <div className="flex items-center gap-4">
-                    <span className="font-mono text-xs md:text-[13px] text-gray-700 whitespace-nowrap">
-                        Carrito ( {items.length} )
-                    </span>
-                    {items.length > 0 && (
-                        <button
-                            onClick={vaciarCarrito}
-                            className="hidden md:block text-xs text-accent-dark underline"
+                    <Link
+                        to="carrito"
+                        onClick={cerrar}
+                        className=" font-mono text-xs md:text-[13px] text-gray-700 whitespace-nowrap
+                        hover:text-ink transition-colors"
                         >
-                            Vaciar
-                        </button>
-                    )}
+                            carrito ( {unidades} )
+                    </Link>
                     {usuario ? (
                         <div className="hidden md:flex items-center gap-4">
                             <span className="text-sm font-semibold">Hola, {usuario}</span>
@@ -164,7 +162,6 @@ function Navbar() {
                                     Ingresar
                                 </Link>
                             )}
-
                         </li>
                     </ul>
                 </div>
