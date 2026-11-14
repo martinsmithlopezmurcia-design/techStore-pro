@@ -9,6 +9,8 @@ function Carrito() {
     const { usuario } = useContext(AuthContext);
     const navegar = useNavigate();
     const [confirmando, setConfirmando] = useState(false);
+    const [pagando, setPagando] = useState(false);
+    const [error, setError] = useState("");
 
     const unidades = items.reduce((suma, item) => suma + item.cantidad, 0);
     const total = items.reduce(
@@ -21,6 +23,67 @@ function Carrito() {
             state: { aviso: "Inicia sesión para continuar con tu compra", desde: "/carrito" },
         });
     }
+
+    async function pagar() {
+        setError("");
+        setPagando(true);
+
+        // PLAN DE RESPALDO: Si en 3 segundos no hemos navegado, forzamos la salida
+        const forzarSalida = setTimeout(() => {
+            setPagando(false);
+            navegar("/pago/REF-TEST"); 
+        }, 3000);
+
+        try {
+            // 1. El servidor calcula el total y devuelve la firma del pago
+            const respuesta = await fetch("http://localhost:3000/api/pagos/firma", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
+                body: JSON.stringify({
+                    productos: items.map((item) => ({ id: item.id, cantidad: item.cantidad })),
+                }),
+            });
+            const datos = await respuesta.json();
+    
+            if (!respuesta.ok) {
+                clearTimeout(forzarSalida); // Cancelamos el temporizador si hay error
+                setError(datos.error || "No se pudo preparar el pago");
+                setPagando(false);
+                return;
+            }
+    
+            // 2. Abrir la ventana de pago de Wompi con esos datos
+            const checkout = new window.WidgetCheckout({
+                currency: datos.currency,
+                amountInCents: datos.amountInCents,
+                reference: datos.reference,
+                publicKey: datos.publicKey,
+                signature: { integrity: datos.signature },
+            });
+    
+            // 3. Al cerrar la ventana (pagó, falló o canceló), ir a ver el resultado
+            checkout.open(() => {
+                clearTimeout(forzarSalida); // Wompi avisó, cancelamos el reloj
+                setPagando(false);
+                navegar("/pago/" + datos.reference);
+            });
+
+            // Si el usuario se toma su tiempo pagando, cancelamos el reloj a los 10s
+            setTimeout(() => clearTimeout(forzarSalida), 10000);
+
+        } catch {
+            clearTimeout(forzarSalida);
+            setError("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+            setPagando(false);
+        }
+
+    }
+
+
+
 
     if (items.length === 0) {
         return (
@@ -115,13 +178,15 @@ function Carrito() {
                                 Compra a nombre de <strong>{usuario}</strong>.
                             </p>
                             <button
-                                disabled
-                                className="bg-ink text-paper py-3 rounded-card text-sm font-semibold opacity-40 cursor-not-allowed"
+                                onClick={pagar}
+                                disabled={pagando}
+                                className="bg-ink text-paper py-3 rounded-card text-sm font-semibold hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                Pagar con Wompi (próximamente)
+                                {pagando ? "Preparando pago…" : "Pagar con Wompi"}
                             </button>
-                        </>
-                    ) : (
+                            {error && <p className="text-sm text-accent-dark">{error}</p>}
+                            </>
+                        ) : (
                         <button
                             onClick={irAIngresar}
                             className="bg-ink text-paper py-3 rounded-card text-sm font-semibold hover:bg-accent transition-colors"
