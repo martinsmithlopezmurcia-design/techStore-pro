@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { CartContext } from "../context/CartContext.jsx";
-import { AuthContext } from "../context/AuthContext.jsx";
+import { CartContext } from "../context/CartContext";
+import { AuthContext } from "../context/AuthContext";
 
 const enlaces = [
     { ruta: "/", texto: "Inicio" },
@@ -47,30 +47,33 @@ function Navbar() {
                     <Link
                         to="/carrito"
                         onClick={cerrar}
-                        className=" font-mono text-xs md:text-[13px] text-gray-700 whitespace-nowrap
-                        hover:text-ink transition-colors"
-                        >
-                            carrito ( {unidades} )
+                        className="font-mono text-xs md:text-[13px] text-gray-700 whitespace-nowrap hover:text-ink transition-colors"
+                    >
+                        Carrito ( {unidades} )
                     </Link>
+
                     {usuario ? (
                         <div className="hidden md:flex items-center gap-4">
                             <Link
-                                to="/mis-pedidos"
-                                className="text-sm font-medium text-gray-700 hover:text-ink transition-colors">
-                                    Mis pedidos
-                                </Link>
+                                to="/cuenta"
+                                className="text-sm font-medium text-gray-700 hover:text-ink transition-colors"
+                            >
+                                Mi cuenta
+                            </Link>
+
+                            <span className="text-sm font-semibold">Hola, {usuario}</span>
 
                             <button
-                            onClick={logout}
-                            className="text-sm text-gray-700 underline hover:text-ink transition-colors">
+                                onClick={logout}
+                                className="text-sm text-gray-700 underline hover:text-ink transition-colors"
+                            >
                                 Salir
                             </button>
                         </div>
                     ) : (
                         <Link
-                        to="/login"
-                        className="hidden md:block bg-ink text-paper px-5 py-2.5
-                        rounded-card text-sm font-semibold hover:bg-accent transition-colors"
+                            to="/login"
+                            className="hidden md:block bg-ink text-paper px-5 py-2.5 rounded-card text-sm font-semibold hover:bg-accent transition-colors"
                         >
                             Ingresar
                         </Link>
@@ -145,21 +148,20 @@ function Navbar() {
                             {usuario ? (
                                 <div className="flex flex-col gap-5">
                                     <Link
-                                        to="mis-pedidos"
+                                        to="/cuenta"
                                         onClick={cerrar}
                                         className="font-display font-semibold text-3xl tracking-tight text-gray-500"
-                                        >
-                                            Mis pedidos
+                                    >
+                                        Mi cuenta
                                     </Link>
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-semibold">Hola, {usuario}</span>
                                         <button
-                                        onClick={() => {
-                                            logout();
-                                            cerrar();
-                                        }}
-                                        className="bg-ink text-paper px-6 py-3 rounded-card 
-                                        text-sm font-semibold"
+                                            onClick={() => {
+                                                logout();
+                                                cerrar();
+                                            }}
+                                            className="bg-ink text-paper px-6 py-3 rounded-card text-sm font-semibold"
                                         >
                                             Salir
                                         </button>
@@ -167,10 +169,9 @@ function Navbar() {
                                 </div>
                             ) : (
                                 <Link
-                                to="/login"
-                                onClick={cerrar}
-                                className="block w-full text-center bg-ink text-paper py-3.5
-                                rounded-card text-sm font-semibold"
+                                    to="/login"
+                                    onClick={cerrar}
+                                    className="block w-full text-center bg-ink text-paper py-3.5 rounded-card text-sm font-semibold"
                                 >
                                     Ingresar
                                 </Link>
