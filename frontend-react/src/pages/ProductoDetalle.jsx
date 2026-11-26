@@ -1,6 +1,7 @@
-import { useState, useEffect, useContext  } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { CartContext } from "../context/CartContext.jsx";
+import BotonFavorito from "../components/BotonFavorito.jsx";
 
 function ProductoDetalle() {
     const { id } = useParams();
@@ -8,12 +9,13 @@ function ProductoDetalle() {
     const [producto, setProducto] = useState(null);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
-    const [agregado, setAgregago] = useState(false);
+    const [agregado, setAgregado] = useState(false);
     const [otros, setOtros] = useState([]);
 
     useEffect(() => {
         setCargando(true);
         setError(null);
+        setAgregado(false);
 
         // 1. Traemos el producto específico para este detalle
         fetch("http://localhost:3000/api/productos/" + id)
@@ -32,7 +34,7 @@ function ProductoDetalle() {
             .then((res) => res.json())
             .then((datos) => setOtros(Array.isArray(datos) ? datos : []))
             .catch(() => setOtros([]));
-    }, [id]); // Es importante agregar [id] para que se actualice si cambias de producto
+    }, [id]);
 
     useEffect(() => {
         if (!producto) return;
@@ -47,9 +49,10 @@ function ProductoDetalle() {
         agregarAlCarrito({
             id: producto.id,
             nombre: producto.nombre,
-            precio: producto.precio, // Corregido: antes tenías producto.imagen asignado a precio
+            precio: producto.precio,
+            imagen: producto.imagen,
         });
-        setAgregago(true);
+        setAgregado(true);
     }
 
     if (cargando) {
@@ -67,7 +70,6 @@ function ProductoDetalle() {
         );
     }
 
-    // Se procesa aquí abajo asegurándonos de que 'otros' sea un array y la carga terminó
     const relacionados = otros.filter((p) => p._id !== id).slice(0, 3);
 
     return (
@@ -94,13 +96,23 @@ function ProductoDetalle() {
                     <p className="font-mono text-3xl font-bold">
                         {producto.precio}
                     </p>
-                    <button
-                        onClick={agregar}
-                        disabled={agregado}
-                        className="mt-4 bg-ink text-paper rounded-card py-4 text-sm font-semibold hover:bg-accent transition-colors"
-                    >
-                        {agregado ? "Agregado al carrito" : "Agregar al carrito"}
-                    </button>
+                    <div className="mt-4 flex items-center gap-3">
+                        <button
+                            onClick={agregar}
+                            disabled={agregado}
+                            className="flex-1 bg-ink text-paper rounded-card py-4 text-sm font-semibold hover:bg-accent transition-colors disabled:opacity-50"
+                        >
+                            {agregado ? "Agregado al carrito" : "Agregar al carrito"}
+                        </button>
+                        <BotonFavorito
+                            producto={{
+                                id: producto.id,
+                                nombre: producto.nombre,
+                                precio: producto.precio,
+                                imagen: producto.imagen,
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
 
